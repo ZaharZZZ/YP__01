@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace AdmissionСommitteeLib
 {
-    public class Class1
+    public interface IApplicantDBManager
     {
+        bool CheckApplicantExists(int id);
+        bool InsertApplicant(Applicant applicant);
     }
 }
