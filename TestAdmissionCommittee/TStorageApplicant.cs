@@ -34,6 +34,7 @@ namespace TestAdmissionCommittee
                 Address = address
             };
 
+
             // Настройка мока - абитуриент не существует
             mockDbManager.Setup(x => x.CheckApplicantExists(id)).Returns(false);
             // Настройка мока - успешное добавление в БД
