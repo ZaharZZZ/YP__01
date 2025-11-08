@@ -160,5 +160,30 @@ namespace TestAdmissionCommittee
             mockDbManager.Verify(x => x.DeleteApplicant(applicantId), Times.Once);
             mockDbManager.Verify(x => x.GetDeleteResultMessage(applicantId, true), Times.Once);
         }
+
+        [TestMethod]
+        [DataRow(1)]
+        [DataRow(2)]
+        public void DeleteApplicant_WhenDeleteOperationFails_ShouldReturnErrorMessage(int applicantId)
+        {
+            // Arrange
+            var mockDbManager = new Mock<IApplicantDBManager>();
+            var storageApplicant = new StorageApplicant(mockDbManager.Object);
+
+            bool userConfirmation = true;
+
+            mockDbManager.Setup(x => x.CheckApplicantExists(applicantId)).Returns(true);
+            mockDbManager.Setup(x => x.DeleteApplicant(applicantId)).Returns(false);
+            mockDbManager.Setup(x => x.GetDeleteResultMessage(applicantId, false)).Returns("Абитуриент с указанным ID не найден");
+
+            // Act
+            var result = storageApplicant.DeleteApplicant(applicantId, userConfirmation);
+
+            // Assert
+            Assert.AreEqual("Абитуриент с указанным ID не найден", result);
+            mockDbManager.Verify(x => x.CheckApplicantExists(applicantId), Times.Once);
+            mockDbManager.Verify(x => x.DeleteApplicant(applicantId), Times.Once);
+            mockDbManager.Verify(x => x.GetDeleteResultMessage(applicantId, false), Times.Once);
+        }
     }
 }
