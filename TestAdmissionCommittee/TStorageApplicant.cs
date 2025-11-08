@@ -129,34 +129,36 @@ namespace TestAdmissionCommittee
             mockDbManager.Verify(x => x.CheckApplicantExists(id), Times.Once);
             mockDbManager.Verify(x => x.InsertApplicant(It.Is<Applicant>(a => a.Id == id)), Times.Once);
 
-            // Новые тесты для удаления абитуриента
 
-            [TestMethod]
-            [DataRow(1, "Иванов Иван Иванович")]
-            [DataRow(2, "Петров Петр Петрович")]
-            [DataRow(3, "Сидорова Анна Владимировна")]
-            public void DeleteApplicant_WhenUserConfirmsAndApplicantExists_ShouldDeleteSuccessfully(int applicantId, string fullName)
-            {
-                // Arrange
-                var mockDbManager = new Mock<IApplicantDBManager>();
-                var storageApplicant = new StorageApplicant(mockDbManager.Object);
 
-                bool userConfirmation = true; // Пользователь нажал "ОК"
+        }
 
-                mockDbManager.Setup(x => x.CheckApplicantExists(applicantId)).Returns(true);
-                mockDbManager.Setup(x => x.DeleteApplicant(applicantId)).Returns(true);
-                mockDbManager.Setup(x => x.GetDeleteResultMessage(applicantId, true)).Returns("Абитуриент успешно удалён");
+        // Новые тесты для удаления абитуриента
 
-                // Act
-                var result = storageApplicant.DeleteApplicant(applicantId, userConfirmation);
+        [TestMethod]
+        [DataRow(1, "Иванов Иван Иванович")]
+        [DataRow(2, "Петров Петр Петрович")]
+        [DataRow(3, "Сидорова Анна Владимировна")]
+        public void DeleteApplicant_WhenUserConfirmsAndApplicantExists_ShouldDeleteSuccessfully(int applicantId, string fullName)
+        {
+            // Arrange
+            var mockDbManager = new Mock<IApplicantDBManager>();
+            var storageApplicant = new StorageApplicant(mockDbManager.Object);
 
-                // Assert
-                Assert.AreEqual("Абитуриент успешно удалён", result);
-                mockDbManager.Verify(x => x.CheckApplicantExists(applicantId), Times.Once);
-                mockDbManager.Verify(x => x.DeleteApplicant(applicantId), Times.Once);
-                mockDbManager.Verify(x => x.GetDeleteResultMessage(applicantId, true), Times.Once);
-            }
+            bool userConfirmation = true; // Пользователь нажал "ОК"
 
+            mockDbManager.Setup(x => x.CheckApplicantExists(applicantId)).Returns(true);
+            mockDbManager.Setup(x => x.DeleteApplicant(applicantId)).Returns(true);
+            mockDbManager.Setup(x => x.GetDeleteResultMessage(applicantId, true)).Returns("Абитуриент успешно удалён");
+
+            // Act
+            var result = storageApplicant.DeleteApplicant(applicantId, userConfirmation);
+
+            // Assert
+            Assert.AreEqual("Абитуриент успешно удалён", result);
+            mockDbManager.Verify(x => x.CheckApplicantExists(applicantId), Times.Once);
+            mockDbManager.Verify(x => x.DeleteApplicant(applicantId), Times.Once);
+            mockDbManager.Verify(x => x.GetDeleteResultMessage(applicantId, true), Times.Once);
         }
     }
 }
