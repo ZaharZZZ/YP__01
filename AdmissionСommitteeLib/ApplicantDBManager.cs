@@ -19,6 +19,17 @@ namespace AdmissionСommitteeLib
             // Реализация вставки абитуриента в БД
             return true;
         }
+
+        public bool DeleteApplicant(int id)
+        {
+            // Реализация удаления абитуриента из БД
+            return true;
+        }
+
+        public string GetDeleteResultMessage(int id, bool success)
+        {
+            return success ? "Абитуриент успешно удалён" : "Абитуриент с указанным ID не найден";
+        }
     }
 
     public class StorageApplicant
@@ -38,6 +49,22 @@ namespace AdmissionСommitteeLib
             }
 
             return _dbManager.InsertApplicant(applicant);
+        }
+
+        public string DeleteApplicant(int applicantId, bool userConfirmation)
+        {
+            if (!userConfirmation)
+            {
+                return "Операция удаления отменена пользователем";
+            }
+
+            if (!_dbManager.CheckApplicantExists(applicantId))
+            {
+                return _dbManager.GetDeleteResultMessage(applicantId, false);
+            }
+
+            bool deleteSuccess = _dbManager.DeleteApplicant(applicantId);
+            return _dbManager.GetDeleteResultMessage(applicantId, deleteSuccess);
         }
     }
 }
