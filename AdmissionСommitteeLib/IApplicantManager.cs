@@ -11,5 +11,9 @@ namespace AdmissionСommitteeLib
         List<ApplicantRanking> GetApplicantRankings();
         List<Applicant> GetApplicants();
         string AddApplicant(Applicant applicant);
+        string DeleteApplicant(int applicantId);
+        List<StudyProgram> GetStudyPrograms();
+
+
     }
 }

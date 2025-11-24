@@ -19,6 +19,10 @@ namespace AdmissionСommitteeForm
             _applicantManager = new SQLApplicantManager();
             LoadData();
         }
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            LoadData();
+        }
 
         private void LoadData()
         {
@@ -97,6 +101,55 @@ namespace AdmissionСommitteeForm
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadData();
+        }
+
+        private void addApplicantToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var addForm = new AddApplicantForm())
+            {
+                if (addForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadData(); // Обновляем данные после добавления
+                    MessageBox.Show("Абитуриент успешно добавлен", "Успех",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void deleteApplicantToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewApplicants.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите абитуриента для удаления", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var selectedRow = dataGridViewApplicants.SelectedRows[0];
+            string fullName = selectedRow.Cells["ФИО"].Value.ToString();
+            string programName = selectedRow.Cells["Специальность"].Value.ToString();
+
+            var result = MessageBox.Show(
+                $"Вы уверены, что хотите удалить абитуриента:\n{fullName} ({programName})?",
+                "Подтверждение удаления",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // Здесь нужно добавить метод удаления в ApplicantManager
+                    // Показываем сообщение, что функционал в разработке
+                    MessageBox.Show("Функционал удаления находится в разработке", "Информация",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }

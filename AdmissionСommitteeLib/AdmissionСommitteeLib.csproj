@@ -99,15 +99,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Applicant.cs" />
-    <Compile Include="ApplicantDBManager.cs" />
+    <Compile Include="Applicant\Applicant.cs" />
+    <Compile Include="Applicant\ApplicantDBManager.cs" />
     <Compile Include="ApplicantRanking.cs" />
     <Compile Include="AppSettings.cs" />
-    <Compile Include="IApplicantDBManager.cs" />
+    <Compile Include="Applicant\IApplicantDBManager.cs" />
     <Compile Include="IApplicantManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLApplicantManager.cs" />
     <Compile Include="StorageApplicant.cs" />
+    <Compile Include="StudyProgram.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
