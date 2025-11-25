@@ -283,7 +283,100 @@ namespace AdmissionСommitteeLib
 
             return result;
         }
+        public string AddApplicantWithDocuments(Applicant applicant,
+    string documentType, string documentSeries, string documentNumber,
+    int yearOfGraduation, decimal gpa, int programId, string educationForm,
+    string fundingSource, bool originalProvided)
+        {
+            using (MySqlConnection conn = new MySqlConnection(AppSettings.ConnectionString))
+            {
+                MySqlTransaction transaction = null;
 
+                try
+                {
+                    conn.Open();
+                    transaction = conn.BeginTransaction();
+
+                    // 1. Добавляем абитуриента
+                    string insertApplicant = @"
+                INSERT INTO applicants 
+                (full_name, birth_date, passport_series, passport_number, phone, email, snils, address) 
+                VALUES (@FullName, @BirthDate, @PassportSeries, @PassportNumber, @Phone, @Email, @SNILS, @Address);
+                SELECT LAST_INSERT_ID();";
+
+                    int applicantId;
+                    using (MySqlCommand cmd = new MySqlCommand(insertApplicant, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@FullName", applicant.FullName);
+                        cmd.Parameters.AddWithValue("@BirthDate", applicant.BirthDate);
+                        cmd.Parameters.AddWithValue("@PassportSeries", applicant.PassportSeries);
+                        cmd.Parameters.AddWithValue("@PassportNumber", applicant.PassportNumber);
+                        cmd.Parameters.AddWithValue("@Phone", applicant.Phone);
+                        cmd.Parameters.AddWithValue("@Email", applicant.Email);
+                        cmd.Parameters.AddWithValue("@SNILS", applicant.SNILS);
+                        cmd.Parameters.AddWithValue("@Address", applicant.Address);
+
+                        applicantId = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+
+                    // 2. Добавляем документы об образовании
+                    string insertDocuments = @"
+                INSERT INTO educational_documents 
+                (applicant_id, document_type, series, number, year_of_graduation, gpa) 
+                VALUES (@ApplicantId, @DocumentType, @Series, @Number, @YearOfGraduation, @GPA)";
+
+                    using (MySqlCommand cmd = new MySqlCommand(insertDocuments, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@ApplicantId", applicantId);
+                        cmd.Parameters.AddWithValue("@DocumentType", documentType);
+                        cmd.Parameters.AddWithValue("@Series", documentSeries);
+                        cmd.Parameters.AddWithValue("@Number", documentNumber);
+                        cmd.Parameters.AddWithValue("@YearOfGraduation", yearOfGraduation);
+                        cmd.Parameters.AddWithValue("@GPA", gpa);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // 3. Добавляем заявление
+                    string insertApplication = @"
+                INSERT INTO applications 
+                (applicant_id, program_id, application_date, status, education_form, funding_source, original_provided) 
+                VALUES (@ApplicantId, @ProgramId, NOW(), 'подано', @EducationForm, @FundingSource, @OriginalProvided)";
+
+                    using (MySqlCommand cmd = new MySqlCommand(insertApplication, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@ApplicantId", applicantId);
+                        cmd.Parameters.AddWithValue("@ProgramId", programId);
+                        cmd.Parameters.AddWithValue("@EducationForm", educationForm);
+                        cmd.Parameters.AddWithValue("@FundingSource", fundingSource);
+                        cmd.Parameters.AddWithValue("@OriginalProvided", originalProvided);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // 4. Добавляем в рейтинговый список
+                    string insertRanking = @"
+                INSERT INTO ranking_lists 
+                (applicant_id, program_id, total_score, list_type) 
+                VALUES (@ApplicantId, @ProgramId, @GPA, @FundingSource)";
+
+                    using (MySqlCommand cmd = new MySqlCommand(insertRanking, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@ApplicantId", applicantId);
+                        cmd.Parameters.AddWithValue("@ProgramId", programId);
+                        cmd.Parameters.AddWithValue("@GPA", gpa);
+                        cmd.Parameters.AddWithValue("@FundingSource", fundingSource);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                    return "Абитуриент успешно добавлен со всеми данными";
+                }
+                catch (Exception ex)
+                {
+                    transaction?.Rollback();
+                    return "Ошибка при добавлении абитуриента: " + ex.Message;
+                }
+            }
+        }
 
     }
 }

@@ -14,6 +14,9 @@ namespace AdmissionСommitteeLib
         string DeleteApplicant(int applicantId);
         List<StudyProgram> GetStudyPrograms();
 
-
+        string AddApplicantWithDocuments(Applicant applicant,
+    string documentType, string documentSeries, string documentNumber,
+    int yearOfGraduation, decimal gpa, int programId, string educationForm,
+    string fundingSource, bool originalProvided);
     }
 }
