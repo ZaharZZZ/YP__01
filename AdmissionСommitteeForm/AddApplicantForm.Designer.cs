@@ -346,6 +346,7 @@ namespace AdmissionСommitteeForm
             this.Text = "Добавление абитуриента";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
         #endregion
 
