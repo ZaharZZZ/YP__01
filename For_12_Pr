@@ -1,0 +1,55 @@
+.model small
+.stack 256
+.data
+.386
+a db 34      ; произвольное значение
+b db -15     ; произвольное значение
+c db 7       ; произвольное значение
+d db 3       ; произвольное значение
+y dw 0       ; результат
+temp dw 0    ; временная переменная
+
+.code
+main:
+    mov ax, @data
+    mov ds, ax
+    xor ax, ax
+    xor bx, bx
+    
+    ; загружаем значения в регистры согласно условию
+    mov al, a     ; a -> al
+    mov bl, b     ; b -> bl
+    mov cl, c     ; c -> cl
+    mov dl, d     ; d -> dl
+    
+    ; вычисляем a/b
+    movsx ax, al   ; расширяем a до 16 бит со знаком
+    movsx bx, bl   ; расширяем b до 16 бит со знаком
+    cwd           ; расширяем ax до dx:ax для деления
+    idiv bx       ; ax = a/b
+    mov si, ax    ; сохраняем a/b в si
+    
+    ; вычисляем (c+2)/d
+    movsx ax, cl   ; c -> ax со знаком
+    add ax, 2      ; c + 2
+    movsx bx, dl   ; d -> bx со знаком
+    cwd           ; расширяем ax до dx:ax
+    idiv bx       ; ax = (c+2)/d
+    
+    ; вычисляем a/b - (c+2)/d
+    sub si, ax    ; si = a/b - (c+2)/d
+    
+    ; вычисляем a²
+    movsx ax, byte ptr [a]  ; загружаем a снова
+    imul ax        ; ax = a*a
+    
+    ; умножаем на результат вычитания
+    imul si        ; dx:ax = (a/b-(c+2)/d)*a²
+    
+    ; так как результат может быть больше 16 бит, сохраняем в y только младшие 16 бит
+    mov y, ax
+    
+exit:
+    mov ah, 4Ch
+    int 21h
+end main
